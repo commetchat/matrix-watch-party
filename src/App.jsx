@@ -1,6 +1,6 @@
 
 import * as sdk from "./matrixrtc/matrixrtc-sdk";
-import { createEffect, createSignal, onMount } from "solid-js";
+import { createEffect, createSignal, onMount, onCleanup, Show } from "solid-js";
 import VideoPlayer from './ui/VideoPlayer';
 import { createStore } from 'solid-js/store'
 import ControlPanel from './ui/ControlPanel';
@@ -37,6 +37,23 @@ const App = () => {
     }
   }
 
+  const [rect, setRect] = createSignal({
+    height: window.innerHeight,
+    width: window.innerWidth
+  });
+
+  const handler = (event) => {
+    setRect({ height: window.innerHeight, width: window.innerWidth });
+  };
+
+  onMount(() => {
+    window.addEventListener('resize', handler);
+  });
+
+  onCleanup(() => {
+    window.removeEventListener('resize', handler);
+  })
+
   createEffect(() => {
     if (window.RTC != undefined) {
       window.RTC.sendData({
@@ -53,10 +70,11 @@ const App = () => {
 
   return (
     <>
-
       <div style={{ overflow: "clip", height: "100dvh", width: "100dvw", background: "#0c0c0c" }}>
         <div style={{ height: "100dvh", width: "100dvw", display: "flex" }}>
+          <Show when={rect().height > 300 && rect().width > 300}>
           <ControlPanel></ControlPanel>
+          </Show>
           <VideoPlayer></VideoPlayer>
         </div>
       </div>
