@@ -175,7 +175,7 @@ export default () => {
             <Show when={currentVideo() != ""}>
                 <iframe ref={youtubeIfrme} onLoad={onLoad} style={{ width: "100%", height: "100%" }} src={idToIframeUrl()} title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture;" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
             </Show>
-            <div class="backdrop-blur-2xl z-10 bg-white/20 rounded-2xl p-4  text-xs absolute top-0">
+            {/* <div class="backdrop-blur-2xl z-10 bg-white/20 rounded-2xl p-4  text-xs absolute top-0">
                 {
                     <pre>
                         Playback info:
@@ -190,8 +190,7 @@ export default () => {
                         }
                     </pre>
                 }
-
-            </div>
+            </div> */}
         </div>
     )
 };

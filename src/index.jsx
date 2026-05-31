@@ -10,7 +10,7 @@ import MatrixRTCApp from './MatrixRTC';
 import MockRTCApp from './MockRTC';
 const root = document.getElementById('root');
 
-import { argbFromHex, themeFromSourceColor, applyTheme } from "@material/material-color-utilities";
+import { argbFromHex, themeFromSourceColor, applyTheme, Scheme } from "@material/material-color-utilities";
 
 if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
   throw new Error(
@@ -18,25 +18,52 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
   );
 }
 
-const theme = themeFromSourceColor(argbFromHex('#f82506'), [
-  {
-    name: "custom-1",
-    value: argbFromHex("#ff0000"),
-    blend: true,
-  },
-]);
 
-// Print out the theme as JSON
-console.log(JSON.stringify(theme, null, 2));
 
-// Check if the user has dark mode turned on
-const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+try {
+  const urlParams = new URLSearchParams(window.location.search)
+  console.log(urlParams);
 
-// Apply the theme to the body by updating custom properties for material tokens
-applyTheme(theme, {target: document.body, dark: true});
+  var scheme = urlParams.get("chat.commet.color_scheme");
+  console.log(scheme);
+  let colorScheme = JSON.parse(scheme)
+
+  console.log(colorScheme)
+
+  function camelToKebab(str) {
+    return str.replace(/[A-Z]/g, m => `-${m.toLowerCase()}`);
+  }
+
+  function applyMaterialTheme(scheme) {
+    const root = document.documentElement;
+
+    for (const [key, value] of Object.entries(scheme)) {
+      if (key === "brightness") continue;
+
+      let cssKey = `--md-sys-color-${camelToKebab(key)}`;
+
+      console.log("Setting: ", cssKey)
+      root.style.setProperty(
+        cssKey,
+        value
+      );
+    }
+  }
+
+  applyMaterialTheme(colorScheme);
+} catch (_) {
+
+  const theme = themeFromSourceColor(argbFromHex('#f82506'));
+  // Check if the user has dark mode turned on
+  const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+  // Apply the theme to the body by updating custom properties for material tokens
+  applyTheme(theme, { target: document.body, dark: true });
+}
+
 
 render(() => <Router>
   <Route path="/" component={MatrixRTCApp} />
-  <Route path="/dev" component={DevMode}/>
-  <Route path="/mock" component={MockRTCApp}/>
+  <Route path="/dev" component={DevMode} />
+  <Route path="/mock" component={MockRTCApp} />
 </Router>, root);
