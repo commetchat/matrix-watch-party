@@ -5,6 +5,7 @@ import ControlPanel from './ui/ControlPanel';
 import "@material/web/progress/circular-progress.js";
 import { createEffect, onMount, Show, createSignal  } from "solid-js";
 import App from './App';
+import { applyMaterialTheme } from "./utils";
 
 const MatrixRTCApp = () => {
 
@@ -18,6 +19,17 @@ const MatrixRTCApp = () => {
             window.RTC = await sdk.createMatrixRTCSdk("chat.commet.matrix-watch-party")
             console.log("Finished creating sdk");
             const rtc = window.RTC;
+
+            window.RTC.widget.api.on("action:theme_change", (event) => {
+                console.log(event.detail); 
+                let colorScheme = event.detail.data["chat.commet.color_scheme"];
+                console.log("Color scheme: ", colorScheme);
+
+                if(colorScheme != undefined) {
+                    console.log("Applying!")
+                    applyMaterialTheme(colorScheme)
+                }
+            });
 
             console.log("Joining");
             const connectionState = rtc.join();

@@ -1,6 +1,5 @@
-git clone https://github.com/element-hq/element-call.git element-call
+git clone https://github.com/commetchat/element-call.git element-call
 cd element-call
-git checkout v0.20.0
 pnpm install
 pnpm build:sdk
 

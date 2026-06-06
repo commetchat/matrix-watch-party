@@ -92,48 +92,51 @@ export default () => {
     let textbox;
 
     return (
-        <div class={`${expanded() ? "w-96" : "w-min"} rounded-2xl p-2 transition-[width] bg-(--md-sys-color-surface)`}>
+        <div class={`${expanded() ? "w-96" : "w-min"} p-2 transition-[width] bg-(--md-sys-color-surface)`}>
             <div class="space-y-2 h-dvh flex-col">
                 <md-fab variant="secondary" onclick={onExpand} >
                     <md-icon slot="icon" class={`${expanded() ? "rotate-180" : ""} transition-transform `}>chevron_forward</md-icon>
                 </md-fab>
 
                 <Show when={expanded()}>
-                    <div class="flex flex-row space-x-2">
-                        <md-outlined-text-field ref={textbox} class={"w-full"} label="Enter Link">
-                        </md-outlined-text-field>
-                        <md-fab onclick={onSubmitLink} variant="primary">
-                            <md-icon slot="icon">check</md-icon>
-                        </md-fab>
-                    </div>
+                    <div class="h-full">
+                        <div class="overflow-scroll h-full flex flex-col scrollbar-none py-1">
 
-                    <div class="overflow-scroll flex flex-col">
-                        <For each={combinedPlaylist()}>
-                            {
-                                (id, index) => {
-                                    let url = new URL(id)
+                            <div class="flex flex-row space-x-2 space-y-2">
+                                <md-outlined-text-field ref={textbox} class={"w-full"} label="Enter Link">
+                                </md-outlined-text-field>
+                                <md-fab onclick={onSubmitLink} variant="primary">
+                                    <md-icon slot="icon">check</md-icon>
+                                </md-fab>
+                            </div>
 
-                                    console.log(url)
-                                    console.log(url.hostname);
+                            <For each={combinedPlaylist()}>
+                                {
+                                    (id, index) => {
+                                        let url = new URL(id)
 
-                                    if (url.protocol == "youtube:") {
-                                        return (
-                                            <>
-                                                <div>
-                                                    <md-text-button onclick={() => { openVideo(id); }} trailing-icon>
-                                                        Open {id}
-                                                        <svg slot="icon" viewBox="0 0 48 48"><path d="M9 42q-1.2 0-2.1-.9Q6 40.2 6 39V9q0-1.2.9-2.1Q7.8 6 9 6h13.95v3H9v30h30V25.05h3V39q0 1.2-.9 2.1-.9.9-2.1.9Zm10.1-10.95L17 28.9 36.9 9H25.95V6H42v16.05h-3v-10.9Z" /></svg>
-                                                    </md-text-button>
-                                                    <iframe class="rounded-3xl pointer-events-none" height="200" src={`https://www.youtube-nocookie.com/embed/${url.hostname}?controls=0&fs=0`} title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-                                                </div>
-                                            </>
-                                        )
+                                        console.log(url)
+                                        console.log(url.hostname);
+
+                                        if (url.protocol == "youtube:") {
+                                            return (
+                                                <>
+                                                    <div>
+                                                        <md-text-button onclick={() => { openVideo(id); }} trailing-icon>
+                                                            Open {id}
+                                                            <svg slot="icon" viewBox="0 0 48 48"><path d="M9 42q-1.2 0-2.1-.9Q6 40.2 6 39V9q0-1.2.9-2.1Q7.8 6 9 6h13.95v3H9v30h30V25.05h3V39q0 1.2-.9 2.1-.9.9-2.1.9Zm10.1-10.95L17 28.9 36.9 9H25.95V6H42v16.05h-3v-10.9Z" /></svg>
+                                                        </md-text-button>
+                                                        <iframe class="rounded-3xl pointer-events-none" height="200" src={`https://www.youtube-nocookie.com/embed/${url.hostname}?controls=0&fs=0`} title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                                                    </div>
+                                                </>
+                                            )
+                                        }
+
+                                        return <></>
                                     }
-
-                                    return <></>
                                 }
-                            }
-                        </For>
+                            </For>
+                        </div>
                     </div>
                 </Show>
 

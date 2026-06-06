@@ -8,6 +8,9 @@ import App from './App';
 import DevMode from './DevMode';
 import MatrixRTCApp from './MatrixRTC';
 import MockRTCApp from './MockRTC';
+
+import {applyMaterialTheme} from './utils'
+
 const root = document.getElementById('root');
 
 import { argbFromHex, themeFromSourceColor, applyTheme, Scheme } from "@material/material-color-utilities";
@@ -30,25 +33,7 @@ try {
 
   console.log(colorScheme)
 
-  function camelToKebab(str) {
-    return str.replace(/[A-Z]/g, m => `-${m.toLowerCase()}`);
-  }
 
-  function applyMaterialTheme(scheme) {
-    const root = document.documentElement;
-
-    for (const [key, value] of Object.entries(scheme)) {
-      if (key === "brightness") continue;
-
-      let cssKey = `--md-sys-color-${camelToKebab(key)}`;
-
-      console.log("Setting: ", cssKey)
-      root.style.setProperty(
-        cssKey,
-        value
-      );
-    }
-  }
 
   applyMaterialTheme(colorScheme);
 } catch (_) {
