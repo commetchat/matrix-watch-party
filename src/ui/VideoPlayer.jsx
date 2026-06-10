@@ -7,7 +7,7 @@ import "@material/web/button/filled-button.js";
 
 import { useAppState, useCurrentVideo, useRemoteState } from '../App';
 import MemberState, { PlaybackStates } from '../state/PlaybackState';
-export default () => {
+export default (props) => {
     let youtubeIfrme;
     let controller = null;
 
@@ -22,6 +22,10 @@ export default () => {
         return diff < 0.3
     }
 
+    const debugView = false;
+
+    var seekTo = null;
+
     const onReceivedData = (data) => {
         var msg = JSON.parse(data.data);
 
@@ -31,6 +35,14 @@ export default () => {
             let map = new Map(prevMap);
 
             map.set(data.rtcBackendIdentity, msg.state);
+
+            if(playbackState().videoId == null) {
+                let state = structuredClone(playbackState());
+                state.videoId = msg.state.videoId;
+                setPlaybackState(state);
+                setCurrentVideo(msg.state.videoId)
+                seekTo = msg.state.progress;
+            }
 
             setRemoteUserStates(map);
         }
@@ -65,7 +77,6 @@ export default () => {
                 let state = structuredClone(playbackState());
                 state.videoId = msg.state;
                 setPlaybackState(state);
-
                 setCurrentVideo(msg.state)
             }
         }
@@ -144,6 +155,13 @@ export default () => {
         controller.addEventListener("userplay", onUserPlay);
         controller.addEventListener("statechange", onStateChange);
         controller.addEventListener("timechanged", onTimechanged);
+        
+        if(seekTo != null) {
+            controller.remoteUserSeek(seekTo);
+            controller.remoteUserPlay();
+            seekTo = null;
+        }
+        console.log("Seeking to: ", seekTo);
     }
 
     const doRemotePause = () => {
@@ -175,6 +193,25 @@ export default () => {
             <Show when={currentVideo() != ""}>
                 <iframe ref={youtubeIfrme} onLoad={onLoad} style={{ width: "100%", height: "100%" }} src={idToIframeUrl()} title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture;" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
             </Show>
+            <Show when={props.debugMode == true}>
+
+            <div class="backdrop-blur-2xl z-10 bg-white/20 rounded-2xl p-4  text-xs absolute top-0">
+                {
+                    <pre>
+                        Playback info:
+                        {
+                            JSON.stringify(playbackState(), null, "  ")
+                        }
+
+                        <br></br>
+                        Remote User Info:
+                        {
+                            JSON.stringify(Object.fromEntries(remoteUserStates().entries()), null, "  ")
+                        }
+                    </pre>
+                }
+            </div> 
+                </Show>
         </div>
     )
 };

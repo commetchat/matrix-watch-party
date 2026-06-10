@@ -121,13 +121,11 @@ export default () => {
                                         if (url.protocol == "youtube:") {
                                             return (
                                                 <>
-                                                    <div>
+                                                    <a onclick={console.log("Clicked: ", id)}>
                                                         <md-text-button onclick={() => { openVideo(id); }} trailing-icon>
-                                                            Open {id}
-                                                            <svg slot="icon" viewBox="0 0 48 48"><path d="M9 42q-1.2 0-2.1-.9Q6 40.2 6 39V9q0-1.2.9-2.1Q7.8 6 9 6h13.95v3H9v30h30V25.05h3V39q0 1.2-.9 2.1-.9.9-2.1.9Zm10.1-10.95L17 28.9 36.9 9H25.95V6H42v16.05h-3v-10.9Z" /></svg>
-                                                        </md-text-button>
                                                         <iframe class="rounded-3xl pointer-events-none" height="200" src={`https://www.youtube-nocookie.com/embed/${url.hostname}?controls=0&fs=0`} title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-                                                    </div>
+                                                        </md-text-button>
+                                                    </a>
                                                 </>
                                             )
                                         }
@@ -142,10 +140,6 @@ export default () => {
 
                 <Show when={expanded() == false}>
                     <UsersPanel></UsersPanel>
-
-                    <md-fab variant="tertiary" onclick={disconnect} >
-                        <md-icon slot="icon">logout</md-icon>
-                    </md-fab>
                 </Show>
             </div>
         </div>

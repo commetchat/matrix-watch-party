@@ -6,7 +6,7 @@ class Stream {
   constructor() {
     this._events = new EventTarget();
   }
-  
+
   subscribe(callback) {
     this._events.addEventListener("event", (ev) => {
       callback(ev.data);
@@ -22,19 +22,79 @@ class Stream {
 }
 
 class MockRTC {
-
   constructor() {
     this.data$ = new Stream();
     this.members$ = new Stream();
+    this.connected$ = new Stream();
+    this.localMember$ = new Stream();
+
+    this._members = new Array();
 
     window.addEventListener("message", (msg) => {
-      if(msg.source != window.parent) return;
-      
+      if (msg.source != window.parent) return;
+
       let from = msg.data.from;
       let data = msg.data.data.data;
       let type = msg.data.data.type;
 
-      if(type == "sendData") {
+      console.log("Received msg: ", msg);
+
+      if (type == "connect") {
+        this._localUserId = from;
+        this.localMember$.add({
+          membership: {
+            rtcBackendIdentity: from,
+            matrixEventData: {
+              sender: from,
+            },
+            matrixEvent: {
+              event: {
+                room_id: "!fakeroom:example.com"
+              }
+            }
+          }
+        })
+
+        this._members.push({
+          membership: {
+            rtcBackendIdentity: from,
+            matrixEventData: {
+              sender: from,
+            },
+            matrixEvent: {
+              event: {
+                room_id: "!fakeroom:example.com"
+              }
+            }
+          }
+        })
+
+        this.members$.add(this._members);
+      }
+
+      if (type == "join") {
+        console.log(`${this._localUserId} Received member joined! ${from}`);
+
+        this._members.push({
+          membership: {
+            rtcBackendIdentity: from,
+            matrixEventData: {
+              sender: from,
+            },
+            matrixEvent: {
+              event: {
+                room_id: "!fakeroom:example.com"
+              }
+            }
+          }
+        })
+
+        console.log(this._members);
+
+        this.members$.add(this._members);
+      }
+
+      if (type == "sendData") {
         this.data$.add({
           "rtcBackendIdentity": from,
           "data": JSON.stringify(data)
@@ -62,7 +122,7 @@ const MockRTCApp = () => {
   })
 
   return (
-    <App></App>
+    <App debugMode={true}></App>
   );
 };
 

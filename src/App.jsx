@@ -29,7 +29,7 @@ export const useUserAvatars = () => [userAvatars, setUserAvatars]
 export const useLocalMembership = () => [localMembership];
 export const useCallMemberships = () => [memberships];
 
-const App = () => {
+const App = (props) => {
 
   const onReceivedData = (data) => {
     var msg = JSON.parse(data.data);
@@ -53,13 +53,12 @@ const App = () => {
     console.log("RTC: ", window.RTC);
     let map = userMembershipData();
 
-
     let memberIds = Array.from(members.map((i) => i.membership.rtcBackendIdentity))
     console.log(memberIds)
 
     console.log("Memberships changed!", memberIds);
     setMemberships(memberIds);
-    
+
 
     members.forEach(element => {
       console.log(element)
@@ -67,19 +66,23 @@ const App = () => {
       var sender = element.membership.matrixEventData.sender;
       var roomId = element.membership.matrixEvent.event.room_id;
 
-      if(map.has(sender) == false) {
+      if (map.has(sender) == false) {
         map = new Map(map);
         map.set(sender, null);
         setUserMembershipData(map);
-        
-        window.RTC.widget.api.readStateEvents("m.room.member", 1, sender, [roomId]).then((result) => {
-          console.log("Received user membership state: ", result);
-          let data = userMembershipData();
-          data = new Map(data);
-          data.set(sender, result[0]);
 
-          setUserMembershipData(data);
-        });
+        if (window.RTC.widget != undefined) {
+
+
+          window.RTC.widget.api.readStateEvents("m.room.member", 1, sender, [roomId]).then((result) => {
+            console.log("Received user membership state: ", result);
+            let data = userMembershipData();
+            data = new Map(data);
+            data.set(sender, result[0]);
+
+            setUserMembershipData(data);
+          });
+        }
       }
 
     });
@@ -87,26 +90,25 @@ const App = () => {
 
   createEffect(() => {
     let memberStates = userMembershipData();
-    
 
     memberStates.keys().forEach((key) => {
 
       let avatars = userAvatars();
-      if(avatars.has(key)) return;
-      
+      if (avatars.has(key)) return;
+
       let state = memberStates.get(key);
-      if(state == null) return;
+      if (state == null) return;
 
 
       //window.RTC.widget.api.downloadFile();
 
-      if(state.content == null) return;
+      if (state.content == null) return;
 
       let avatar_url = state.content.avatar_url;
 
-      if(avatar_url == null) return;
+      if (avatar_url == null) return;
 
-      if(avatars.has(key)) return;
+      if (avatars.has(key)) return;
 
       avatars = new Map(avatars);
       avatars.set(key, null);
@@ -128,8 +130,10 @@ const App = () => {
 
 
       });
-    
+
     });
+
+    
 
   });
 
@@ -168,9 +172,19 @@ const App = () => {
     }
   });
 
+  const sendPlaylistData = (members) => {
+    if (window.RTC != undefined) {
+      window.RTC.sendData({
+        type: "playlist",
+        state: playlistState(),
+      })
+    }
+  }
+
   onMount(() => {
     window.RTC.data$.subscribe(onReceivedData);
     window.RTC.members$.subscribe(onMembersChanged);
+    window.RTC.members$.subscribe(sendPlaylistData);
     window.RTC.connected$.subscribe(onConnectionStatusChanged);
     window.RTC.localMember$.subscribe(onLocalMembershipChanged);
   });
@@ -181,9 +195,9 @@ const App = () => {
       <div style={{ overflow: "clip", height: "100dvh", width: "100dvw", background: "#0c0c0c" }}>
         <div style={{ height: "100dvh", width: "100dvw", display: "flex" }}>
           <Show when={rect().height > 300 && rect().width > 300}>
-          <ControlPanel></ControlPanel>
+            <ControlPanel></ControlPanel>
           </Show>
-          <VideoPlayer></VideoPlayer>
+          <VideoPlayer debugMode={props.debugMode == true}></VideoPlayer>
         </div>
       </div>
     </>
