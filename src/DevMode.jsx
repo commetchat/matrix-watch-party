@@ -13,7 +13,7 @@ const DevMode = () => {
   let connected = new Array();
 
   const connect = (iframe) => {
-    
+
     var sender = iframe.id;
     iframe.contentWindow.postMessage({
       from: sender,
@@ -21,29 +21,33 @@ const DevMode = () => {
         type: "connect"
       }
     })
-    
-    let frames = connected;
-    
-    frames.forEach((f1) => {
-        f1.contentWindow.postMessage({
-          from: sender,
-          data: {
-            type: "join"
-          }
-        })
 
-        iframe.contentWindow.postMessage({
-          from: f1.id,
-          data: {
-            type: "join"
-          }
-        })
+    let frames = connected;
+
+    frames.forEach((f1) => {
+      f1.contentWindow.postMessage({
+        from: sender,
+        data: {
+          type: "join"
+        }
+      })
+
+      iframe.contentWindow.postMessage({
+        from: f1.id,
+        data: {
+          type: "join"
+        }
+      })
     })
 
 
-    
+
     connected.push(iframe);
   }
+
+function randomNumber(min, max) {
+  return Math.random() * (max - min) + min;
+}
 
   const onMessage = (v) => {
 
@@ -60,7 +64,7 @@ const DevMode = () => {
       }
     })
 
-    if(isConnected == false) return;
+    if (isConnected == false) return;
 
 
     connected.forEach((frame) => {
@@ -70,12 +74,15 @@ const DevMode = () => {
         return;
       }
 
-      if (frame.contentWindow == null || frame.contentWindow == undefined) return;
+      // add delay to simulate ping
+      setTimeout(() => {
+        if (frame.contentWindow == null || frame.contentWindow == undefined) return;
 
-      frame.contentWindow.postMessage({
-        from: sender,
-        data: v.data
-      })
+        frame.contentWindow.postMessage({
+          from: sender,
+          data: v.data
+        })
+      }, randomNumber(500, 1000));
     });
   }
 
@@ -90,63 +97,63 @@ const DevMode = () => {
         <Show when={numFrames >= 1}  >
           <div>
             <button onclick={() => connect(iframe1)} type="button">Connect</button>
-            <iframe id="alice" ref={iframe1} class="w-full h-full" src="/mock" ></iframe>
+            <iframe id="alice" ref={iframe1} class="w-full h-full" src="/mock?dev_user_id=alice" ></iframe>
           </div>
         </Show>
 
         <Show when={numFrames >= 2}  >
           <div>
             <button onclick={() => connect(iframe2)} type="button">Connect</button>
-            <iframe id="bob" ref={iframe2} class="w-full h-full" src="/mock" ></iframe>
+            <iframe id="bob" ref={iframe2} class="w-full h-full" src="/mock?dev_user_id=bob" ></iframe>
           </div>
         </Show>
 
         <Show when={numFrames >= 3}  >
           <div>
             <button onclick={() => connect(iframe3)} type="button">Connect</button>
-            <iframe id="charlie" ref={iframe3} class="w-full h-full" src="/mock" ></iframe>
+            <iframe id="charlie" ref={iframe3} class="w-full h-full" src="/mock?dev_user_id=charlie" ></iframe>
           </div>
         </Show>
 
         <Show when={numFrames >= 4}  >
           <div>
             <button onclick={() => connect(iframe4)} type="button">Connect</button>
-            <iframe id="dan" ref={iframe4} class="w-full h-full" src="/mock" ></iframe>
+            <iframe id="dan" ref={iframe4} class="w-full h-full" src="/mock?dev_user_id=dan" ></iframe>
           </div>
         </Show>
 
         <Show when={numFrames >= 5}  >
           <div>
             <button onclick={() => connect(iframe5)} type="button">Connect</button>
-            <iframe id="edward" ref={iframe5} class="w-full h-full" src="/mock" ></iframe>
+            <iframe id="edward" ref={iframe5} class="w-full h-full" src="/mock?dev_user_id=edward" ></iframe>
           </div>
         </Show>
 
         <Show when={numFrames >= 6}  >
           <div>
             <button onclick={() => connect(iframe6)} type="button">Connect</button>
-            <iframe id="frank" ref={iframe6} class="w-full h-full" src="/mock" ></iframe>
+            <iframe id="frank" ref={iframe6} class="w-full h-full" src="/mock?dev_user_id=frank" ></iframe>
           </div>
         </Show>
 
         <Show when={numFrames >= 7}  >
           <div>
             <button onclick={() => connect(iframe7)} type="button">Connect</button>
-            <iframe id="goblin" ref={iframe7} class="w-full h-full" src="/mock" ></iframe>
+            <iframe id="goblin" ref={iframe7} class="w-full h-full" src="/mock?dev_user_id=goblin" ></iframe>
           </div>
         </Show>
 
         <Show when={numFrames >= 8}  >
           <div>
             <button onclick={() => connect(iframe8)} type="button">Connect</button>
-            <iframe id="hatman" ref={iframe8} class="w-full h-full" src="/mock" ></iframe>
+            <iframe id="hatman" ref={iframe8} class="w-full h-full" src="/mock?dev_user_id=hatman" ></iframe>
           </div>
         </Show>
 
         <Show when={numFrames >= 9}  >
           <div>
             <button onclick={() => connect(iframe9)} type="button">Connect</button>
-            <iframe id="ivan" ref={iframe9} class="w-full h-full" src="/mock" ></iframe>
+            <iframe id="ivan" ref={iframe9} class="w-full h-full" src="/mock?dev_user_id=ivan" ></iframe>
           </div>
         </Show>
       </div>

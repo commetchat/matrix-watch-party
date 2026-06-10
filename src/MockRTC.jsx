@@ -37,8 +37,6 @@ class MockRTC {
       let data = msg.data.data.data;
       let type = msg.data.data.type;
 
-      console.log("Received msg: ", msg);
-
       if (type == "connect") {
         this._localUserId = from;
         this.localMember$.add({
@@ -119,6 +117,14 @@ const MockRTCApp = () => {
 
   onMount(async () => {
     window.RTC = new MockRTC();
+    
+    const urlParams = new URLSearchParams(window.location.search)
+    var id = urlParams.get("dev_user_id");
+    
+    var log = console.log;
+    console.log = (data) => {
+      log(`${id}] `, data);
+    }
   })
 
   return (
