@@ -5,7 +5,7 @@ import ControlPanel from './ui/ControlPanel';
 import "@material/web/progress/circular-progress.js";
 import { createEffect, onMount, Show, createSignal  } from "solid-js";
 import App from './App';
-import { applyMaterialTheme } from "./utils";
+import { applyMaterialTheme, applySafeArea } from "./utils";
 
 const MatrixRTCApp = () => {
 
@@ -28,6 +28,17 @@ const MatrixRTCApp = () => {
                 if(colorScheme != undefined) {
                     console.log("Applying!")
                     applyMaterialTheme(colorScheme)
+                }
+            });
+
+            window.RTC.widget.api.on("action:chat.commet.safe_area_changed", (event) => {
+                console.log(event.detail); 
+                let safeArea = event.detail.data["safeArea"];
+                console.log("Received new safe area: ", safeArea);
+
+                if(safeArea != undefined) {
+                    console.log("Applying!")
+                    applySafeArea(safeArea)
                 }
             });
 

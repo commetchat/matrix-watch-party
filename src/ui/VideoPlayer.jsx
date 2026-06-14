@@ -195,7 +195,9 @@ export default (props) => {
             </Show>
             <Show when={props.debugMode == true}>
 
-            <div class="backdrop-blur-2xl z-10 bg-white/20 rounded-2xl p-4  text-xs absolute top-0">
+            <div class="backdrop-blur-2xl z-10  bg-white/20 rounded-2xl text-xs absolute top-0" style={{
+                "padding-top": "var(--safe-area-top)",
+            }}>
                 {
                     <pre>
                         Playback info:

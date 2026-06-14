@@ -93,7 +93,7 @@ export default () => {
 
     return (
         <div class={`${expanded() ? "w-96" : "w-min"} p-2 transition-[width] bg-(--md-sys-color-surface)`}>
-            <div class="space-y-2 h-dvh flex-col">
+            <div class="space-y-2 pt-(--safe-area-top) pl-(--safe-area-left) h-dvh flex-col">
                 <md-fab variant="secondary" onclick={onExpand} >
                     <md-icon slot="icon" class={`${expanded() ? "rotate-180" : ""} transition-transform `}>chevron_forward</md-icon>
                 </md-fab>

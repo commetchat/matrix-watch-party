@@ -9,7 +9,7 @@ import DevMode from './DevMode';
 import MatrixRTCApp from './MatrixRTC';
 import MockRTCApp from './MockRTC';
 
-import {applyMaterialTheme} from './utils'
+import { applyMaterialTheme, applySafeArea } from './utils'
 
 const root = document.getElementById('root');
 
@@ -33,9 +33,8 @@ try {
 
   console.log(colorScheme)
 
-
-
   applyMaterialTheme(colorScheme);
+
 } catch (_) {
 
   const theme = themeFromSourceColor(argbFromHex('#f82506'));
@@ -46,6 +45,22 @@ try {
   applyTheme(theme, { target: document.body, dark: true });
 }
 
+
+try {
+  const urlParams = new URLSearchParams(window.location.search)
+  console.log(urlParams);
+
+  let safeArea = urlParams.get("safeArea");
+  console.log(safeArea)
+
+  if (safeArea != null && (safeArea.startsWith("$") == false)) {
+    applySafeArea(safeArea);
+  } else {
+    console.log("Not applying safe area")
+  }
+} catch (_) {
+
+}
 
 render(() => <Router>
   <Route path="/" component={MatrixRTCApp} />
