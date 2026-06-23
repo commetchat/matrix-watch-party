@@ -8,7 +8,7 @@ const DevMode = () => {
 
   let iframe1, iframe2, iframe3, iframe4, iframe5, iframe6, iframe7, iframe8, iframe9;
 
-  let numFrames = 4;
+  let numFrames = 2;
 
   let connected = new Array();
 
@@ -82,7 +82,7 @@ function randomNumber(min, max) {
           from: sender,
           data: v.data
         })
-      }, randomNumber(500, 1000));
+      }, randomNumber(0, 30));
     });
   }
 

@@ -11,4 +11,5 @@ export default class MemberState {
     currentState = PlaybackStates.UNSTARTED;
     progress = 0.0
     videoId = null
+    following = ""
 }

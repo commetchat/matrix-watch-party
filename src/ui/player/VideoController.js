@@ -40,7 +40,7 @@ export class YoutubeVideoController extends VideoController {
         this.ignoreEventsQueue.push([Date.now(), callback])
     }
 
-    remoteUserPause() {
+    remoteUserPause(ignoreNextEvent = true) {
         if (!(this.playerState == YoutubePlayerState.PLAYING || this.playerState == YoutubePlayerState.BUFFERING)) {
             console.log("Cannot pause from current state, ignoring");
             return;
@@ -50,12 +50,14 @@ export class YoutubeVideoController extends VideoController {
 
         console.log("Doing remote user pause");
 
-        // ignore next state update informing us the video was paused
-        this.addIgnore((ev) => ev['info']['playerState'] == YoutubePlayerState.PAUSED);
+        if(ignoreNextEvent) {
+            // ignore next state update informing us the video was paused
+            this.addIgnore((ev) => ev['info']['playerState'] == YoutubePlayerState.PAUSED);
+        }
     }
 
 
-    remoteUserPlay() {
+    remoteUserPlay(ignoreNextEvent = true) {
         if (this.playerState == YoutubePlayerState.PLAYING || this.playerState == YoutubePlayerState.BUFFERING) {
             console.log("Cannot play from current state, ignoring");
             return;
@@ -66,7 +68,9 @@ export class YoutubeVideoController extends VideoController {
         this.api.play();
 
         // ignore next state update informing us the video was played
-        this.addIgnore((ev) => ev['info']['playerState'] == YoutubePlayerState.PLAYING);
+        if(ignoreNextEvent) {
+            this.addIgnore((ev) => ev['info']['playerState'] == YoutubePlayerState.PLAYING);
+        }
     }
 
     addEventListener(type, callback) {
@@ -167,7 +171,6 @@ export class YoutubeVideoController extends VideoController {
     }
 
     ignoreEvent(ev) {
-
         this.ignoreEventsQueue = this.ignoreEventsQueue.filter((item) => {
             let addTime = item[0];
             let time = Date.now() - addTime;

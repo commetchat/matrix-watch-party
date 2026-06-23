@@ -15,9 +15,11 @@ const [currentVideo, setCurrentVideo] = createSignal("");
 const [remoteUserStates, setRemoteUserStates] = createSignal(new Map())
 const [playlistState, setPlaylistState] = createSignal(new Array())
 const [remotePlaylistState, setRemotePlaylistState] = createSignal(new Map())
+const [leader, setLeader] = createSignal("")
 
 const [userMembershipData, setUserMembershipData] = createSignal(new Map());
 const [userAvatars, setUserAvatars] = createSignal(new Map());
+const [hideUI, setHideUI] = createSignal(false);
 
 export const useAppState = () => [localUserState, setLocalUserState]
 export const useRemoteState = () => [remoteUserStates, setRemoteUserStates]
@@ -28,6 +30,8 @@ export const useUserAvatars = () => [userAvatars, setUserAvatars]
 
 export const useLocalMembership = () => [localMembership];
 export const useCallMemberships = () => [memberships];
+export const useLeader = () => [leader, setLeader];
+export const useHideUI = () => [hideUI, setHideUI];
 
 const App = (props) => {
 
@@ -86,6 +90,12 @@ const App = (props) => {
       }
 
     });
+
+
+    window.RTC.sendData({
+      type: "state_update",
+      state: localUserState(),
+    })
   }
 
   createEffect(() => {
@@ -127,14 +137,8 @@ const App = (props) => {
 
         setUserAvatars(avatars);
         console.log("User Avatars: ", avatars);
-
-
       });
-
     });
-
-    
-
   });
 
   const onConnectionStatusChanged = (status) => {
@@ -144,6 +148,11 @@ const App = (props) => {
   const onLocalMembershipChanged = (membership) => {
     console.log("Local membership changed: ", membership);
     setLocalMembership(membership)
+
+    window.RTC.sendData({
+      type: "state_update",
+      state: localUserState(),
+    })
   }
 
   const [rect, setRect] = createSignal({
@@ -189,15 +198,23 @@ const App = (props) => {
     window.RTC.localMember$.subscribe(onLocalMembershipChanged);
   });
 
+  const revealSidebar = () => {
+    console.log("HLASKDALSKDJASLDK");
+    setHideUI(false);
+  }
 
   return (
     <>
       <div style={{ overflow: "clip", height: "100dvh", width: "100dvw", background: "#0c0c0c" }}>
         <div style={{ height: "100dvh", width: "100dvw", display: "flex" }}>
-          <Show when={rect().height > 300 && rect().width > 300}>
+          <Show when={rect().height > 200 && rect().width > 200 && hideUI() == false}>
             <ControlPanel></ControlPanel>
           </Show>
-          <VideoPlayer debugMode={props.debugMode == true}></VideoPlayer>
+          <div class="w-full h-full" onclick={revealSidebar}>
+            <div class={`w-full h-full ${hideUI() ? `pointer-events-none` : ""}`} >
+              <VideoPlayer debugMode={props.debugMode == true}></VideoPlayer>
+            </div>
+          </div>
         </div>
       </div>
     </>

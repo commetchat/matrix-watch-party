@@ -9,10 +9,11 @@ import "@material/web/icon/icon"
 import "@material/web/button/filled-tonal-button"
 import "@material/web/button/text-button"
 import "@material/web/chips/suggestion-chip"
+import "@material/web/slider/slider"
 
 import { For, Show } from "solid-js";
-import { useAppState, usePlaylistState, useRemoteState, useRemotePlaylistState, useCurrentVideo } from "../App";
-import { createSignal } from "solid-js";
+import { useAppState, usePlaylistState, useRemoteState, useRemotePlaylistState, useCurrentVideo, useLeader, useLocalMembership, useHideUI } from "../App";
+import { createSignal, createMemo } from "solid-js";
 import UsersPanel from "./UsersPanel"
 
 export default () => {
@@ -22,8 +23,11 @@ export default () => {
     const [playlistState, setPlaylistState] = usePlaylistState()
     const [remotePlaylist, setRemotePlaylist] = useRemotePlaylistState()
     const [currentState, setCurrentState] = useAppState()
-
+    const [leader, setLeader] = useLeader()
     const [expanded, setExpanded] = createSignal(false)
+    const [localMembership] = useLocalMembership();
+    const [hidden, setHidden] = useHideUI();
+
 
     const combinedPlaylist = () => [playlistState(), ...remotePlaylist().values()].flat();
 
@@ -79,6 +83,9 @@ export default () => {
         state.videoId = id;
         setCurrentState(state);
 
+        console.log(localMembership().membership.rtcBackendIdentity);
+        setLeader(localMembership().membership.rtcBackendIdentity)
+
         if (window.RTC != undefined) {
 
             window.RTC.sendData({
@@ -87,16 +94,60 @@ export default () => {
                 state: id,
             })
         }
+
+
+    }
+
+    const isLeader = createMemo(() => {
+        const membership = localMembership();
+        if (membership == null) return false;
+        return membership.membership.rtcBackendIdentity === leader()
+    });
+
+
+    const takeLeadership = () => {
+        const membership = localMembership();
+        if (membership == null) return;
+
+        setLeader(membership.membership.rtcBackendIdentity);
+
+        let state = structuredClone(currentState());
+        state.following = leader();
+        setCurrentState(state);
+
+        if (window.RTC != undefined) {
+
+            window.RTC.sendData({
+                type: "command",
+                command: "takeleadership",
+            })
+        }
+    }
+
+    const hideLeftPanel = () => {
+        setHidden(true);
     }
 
     let textbox;
 
     return (
         <div class={`${expanded() ? "w-96" : "w-min"} p-2 transition-[width] bg-(--md-sys-color-surface)`}>
-            <div class="space-y-2 pt-(--safe-area-top) pl-(--safe-area-left) h-dvh flex-col">
+            <div class="space-y-2 pt-(--safe-area-top) pl-(--safe-area-left) h-dvh flex flex-col">
                 <md-fab variant="secondary" onclick={onExpand} >
                     <md-icon slot="icon" class={`${expanded() ? "rotate-180" : ""} transition-transform `}>chevron_forward</md-icon>
                 </md-fab>
+
+                <Show when={expanded() == false}>
+                    <md-fab lowered={isLeader() == false} variant="tertiary" onclick={takeLeadership} >
+                        <md-icon slot="icon">{`${isLeader() ? "play_arrow" : "play_disabled"}`}</md-icon>
+                    </md-fab>
+
+                    <md-fab variant="tertiary" onclick={setHidden} >
+                        <md-icon slot="icon">{`left_panel_close`}</md-icon>
+                    </md-fab>
+
+                    <UsersPanel></UsersPanel>
+                </Show>
 
                 <Show when={expanded()}>
                     <div class="h-full">
@@ -123,7 +174,7 @@ export default () => {
                                                 <>
                                                     <a onclick={console.log("Clicked: ", id)}>
                                                         <md-text-button onclick={() => { openVideo(id); }} trailing-icon>
-                                                        <iframe class="rounded-3xl pointer-events-none" height="200" src={`https://www.youtube-nocookie.com/embed/${url.hostname}?controls=0&fs=0`} title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                                                            <iframe class="rounded-3xl pointer-events-none" height="200" src={`https://www.youtube-nocookie.com/embed/${url.hostname}?controls=0&fs=0`} title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
                                                         </md-text-button>
                                                     </a>
                                                 </>
@@ -136,10 +187,6 @@ export default () => {
                             </For>
                         </div>
                     </div>
-                </Show>
-
-                <Show when={expanded() == false}>
-                    <UsersPanel></UsersPanel>
                 </Show>
             </div>
         </div>
