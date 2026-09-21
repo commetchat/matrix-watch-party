@@ -11,6 +11,8 @@
 ### Watch videos together
 Watch Party is a Widget for Matrix clients which allows you to watch videos in sync with your friends.
 
+<img width="1368" height="826" alt="Image" src="https://github.com/user-attachments/assets/34684bb5-d04c-4f92-b1d3-7202ee0e7c01" />
+
 ## Development
 Watch Party makes use of the Matrix RTC sdk from Element Call, this needs to be built from source and included in the project directory. This can be done using the `build-matrixrtc.sh` script included in the root of this repo.
 
